@@ -3,23 +3,24 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+// Test class for Calculator
 class CalculatorTest {
 
-    //Method to test subtract
+    // Test for subtract() method with a single case
     @Test
     void testSubtract() {
         Calculator c = new Calculator();
-        assertEquals(1, c.subtract(3, 2)); // This will fail because subtract() doesn't exist yet
+        assertEquals(1, c.subtract(3, 2)); // Expected result: 3 - 2 = 1
     }
 
-    //Method to test add
+    // Test for add() method with a single case
     @Test
     void testAdd() {
         Calculator c = new Calculator();
         assertEquals(5, c.add(2, 3));
     }
 
-    //Parameterized data using CsvSource
+    // Parameterized test for add() method with multiple input cases
     @ParameterizedTest
     @CsvSource({
             "1, 2, 3",
@@ -32,7 +33,7 @@ class CalculatorTest {
     //Method to test add - multiple cases
     void testAddMultipleCases(int a, int b, int expected) {
         Calculator c = new Calculator();
-        assertEquals(expected, c.add(a, b));
+        assertEquals(expected, c.add(a, b)); // Verifies add() with various inputs
     }
 
 }

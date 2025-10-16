@@ -1,10 +1,11 @@
+// Calculator class provides basic arithmetic operations
 public class Calculator {
-    //Method for adding two integers
+    // Adds two integers and returns the result
     public int add(int a, int b) {
         return a + b;
     }
 
-    //method for subtracting two integers
+    // Subtracts the second integer from the first and returns the result
     public int subtract(int a, int b) {
         return a - b;
     }
