@@ -10,7 +10,7 @@ class CalculatorTest {
     @Test
     void testDivide() {
         Calculator c = new Calculator();
-        assertEquals(2, c.divide(6, 3)); // This will fail — divide() not yet implemented
+        assertEquals(2, c.divide(6, 3)); // Expected result: 6/3 = 2 implemented
     }
 
     // Test for divide() method with divide-by-zero case
@@ -19,6 +19,21 @@ class CalculatorTest {
         Calculator c = new Calculator();
         assertThrows(ArithmeticException.class, () -> c.divide(5, 0)); // Expect exception
     }
+
+    // Parameterized test for divide() method with multiple input cases
+    @ParameterizedTest
+    @CsvSource({
+            "6, 3, 2",
+            "10, 2, 5",
+            "-8, 2, -4",
+            "-9, -3, 3",
+            "0, 5, 0"
+    })
+    void testDivideMultipleCases(int a, int b, int expected) {
+        Calculator c = new Calculator();
+        assertEquals(expected, c.divide(a, b)); // Verifies divide() with various inputs
+    }
+
 
 
     // Test for multiply() method with a single case
