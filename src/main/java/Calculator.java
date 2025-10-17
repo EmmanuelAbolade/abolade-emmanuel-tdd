@@ -10,4 +10,9 @@ public class Calculator {
         return a - b;
     }
 
+    // Multiplies two integers and returns the result
+    public int multiply(int a, int b) {
+        return a * b;
+    }
+
 }
