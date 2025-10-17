@@ -15,4 +15,14 @@ public class Calculator {
         return a * b;
     }
 
+    // Divides the first integer by the second and returns the result
+    // Throws ArithmeticException if division by zero is attempted
+    public int divide(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("Cannot divide by zero");
+        }
+        return a / b;
+    }
+
+
 }
