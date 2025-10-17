@@ -13,6 +13,20 @@ class CalculatorTest {
         assertEquals(6, c.multiply(2, 3)); // This will fail — multiply() not yet implemented
     }
 
+    // Parameterized test for multiply() method with multiple input cases
+    @ParameterizedTest
+    @CsvSource({
+            "2, 3, 6",
+            "0, 5, 0",
+            "-2, 4, -8",
+            "-3, -3, 9",
+            "100, 0, 0"
+    })
+    void testMultiplyMultipleCases(int a, int b, int expected) {
+        Calculator c = new Calculator();
+        assertEquals(expected, c.multiply(a, b)); // Verifies multiply() with various inputs
+    }
+
 
     // Test for subtract() method with a single case
     @Test
