@@ -6,11 +6,26 @@ import org.junit.jupiter.params.provider.CsvSource;
 // Test class for Calculator
 class CalculatorTest {
 
+    // Test for divide() method with a single case
+    @Test
+    void testDivide() {
+        Calculator c = new Calculator();
+        assertEquals(2, c.divide(6, 3)); // This will fail — divide() not yet implemented
+    }
+
+    // Test for divide() method with divide-by-zero case
+    @Test
+    void testDivideByZero() {
+        Calculator c = new Calculator();
+        assertThrows(ArithmeticException.class, () -> c.divide(5, 0)); // Expect exception
+    }
+
+
     // Test for multiply() method with a single case
     @Test
     void testMultiply() {
         Calculator c = new Calculator();
-        assertEquals(6, c.multiply(2, 3)); // This will fail — multiply() not yet implemented
+        assertEquals(6, c.multiply(2, 3)); // Expected result: 2 * 3 = 6 implemented
     }
 
     // Parameterized test for multiply() method with multiple input cases
@@ -53,7 +68,7 @@ class CalculatorTest {
     @Test
     void testAdd() {
         Calculator c = new Calculator();
-        assertEquals(5, c.add(2, 3));
+        assertEquals(5, c.add(2, 3)); //Expected result: 2 + 3 = 5
     }
 
     // Parameterized test for add() method with multiple input cases
