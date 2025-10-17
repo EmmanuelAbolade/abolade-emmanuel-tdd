@@ -13,6 +13,20 @@ class CalculatorTest {
         assertEquals(1, c.subtract(3, 2)); // Expected result: 3 - 2 = 1
     }
 
+    // Parameterized test for subtract() method with multiple input cases
+    @ParameterizedTest
+    @CsvSource({
+            "5, 3, 2",
+            "10, 5, 5",
+            "0, 0, 0",
+            "-5, -5, 0",
+            "100, 50, 50"
+    })
+    void testSubtractMultipleCases(int a, int b, int expected) {
+        Calculator c = new Calculator();
+        assertEquals(expected, c.subtract(a, b)); // Verifies subtract() with various inputs
+    }
+
     // Test for add() method with a single case
     @Test
     void testAdd() {
