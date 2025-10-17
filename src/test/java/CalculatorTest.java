@@ -6,6 +6,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 // Test class for Calculator
 class CalculatorTest {
 
+    // Test for multiply() method with a single case
+    @Test
+    void testMultiply() {
+        Calculator c = new Calculator();
+        assertEquals(6, c.multiply(2, 3)); // This will fail — multiply() not yet implemented
+    }
+
+
     // Test for subtract() method with a single case
     @Test
     void testSubtract() {
