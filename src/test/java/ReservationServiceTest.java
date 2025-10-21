@@ -21,4 +21,20 @@ public class ReservationServiceTest {
         //assertTrue(reservationRepo.existsByUserAndBook("u1", "b1"));
     }
 
+    // Test that a reservation is created for the user
+    @Test
+    void testReserveCreatesReservation() {
+        IBookRepository bookRepo = new MemoryBookRepository();
+        IReservationRepository reservationRepo = new MemoryReservationRepository();
+        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+
+        Book book = new Book("b1", "Clean Code", 2);
+        bookRepo.save(book);
+
+        service.reserve("u1", "b1");
+
+        assertTrue(reservationRepo.existsByUserAndBook("u1", "b1"));
+    }
+
+
 }
