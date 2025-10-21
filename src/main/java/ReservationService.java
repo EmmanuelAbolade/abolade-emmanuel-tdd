@@ -15,5 +15,11 @@ public class ReservationService {
         int updatedCopies = book.getCopiesAvailable() - 1;
         book.setCopiesAvailable(updatedCopies);
         bookRepo.save(book);
+
+        // Save the reservation
+        Reservation reservation = new Reservation(userId, bookId);
+        reservationRepo.save(reservation);
+
+
     }
 }
