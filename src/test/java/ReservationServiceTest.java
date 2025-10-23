@@ -55,5 +55,23 @@ public class ReservationServiceTest {
         assertThrows(NoAvailableCopiesException.class, () -> service.reserve("u2", "b2"));
     }
 
+    // Test that a user cannot reserve the same book twice
+    @Test
+    void testReserveFailsIfAlreadyReserved() {
+        IBookRepository bookRepo = new MemoryBookRepository();
+        IReservationRepository reservationRepo = new MemoryReservationRepository();
+        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+
+        // Arrange: Book with 2 copies
+        Book book = new Book("b3", "Domain-Driven Design", 2);
+        bookRepo.save(book);
+
+        // First reservation succeeds
+        service.reserve("u3", "b3");
+
+        // Second reservation by same user should fail
+        assertThrows(IllegalStateException.class, () -> service.reserve("u3", "b3"));
+    }
+
 
 }
