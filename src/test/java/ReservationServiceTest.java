@@ -73,5 +73,25 @@ public class ReservationServiceTest {
         assertThrows(IllegalStateException.class, () -> service.reserve("u3", "b3"));
     }
 
+    // Failing test: cancel() increases copiesAvailable
+    @Test
+    void cancelShouldIncreaseCopiesAvailable() {
+        IBookRepository bookRepo = new MemoryBookRepository();
+        IReservationRepository reservationRepo = new MemoryReservationRepository();
+        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+
+        // Arrange: Book with 1 copy, reserved by user
+        Book book = new Book("b4", "Effective Java", 1);
+        bookRepo.save(book);
+        service.reserve("u4", "b4");
+
+        // Act: Cancel the reservation
+        service.cancel("u4", "b4");
+
+        // Assert: copiesAvailable should be back to 1
+        assertEquals(1, bookRepo.findById("b4").getCopiesAvailable());
+    }
+
+
 
 }
