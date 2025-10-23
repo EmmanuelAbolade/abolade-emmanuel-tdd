@@ -9,13 +9,18 @@ public class ReservationService {
         this.reservationRepo = reservationRepo;
     }
 
-    // Reserve a book for a user (happy path only)
+    // Reserve a book for a user (with rule: must not already be reserved)
     public void reserve(String userId, String bookId) {
         Book book = bookRepo.findById(bookId);
 
         //Cannot reserve if no copies available
         if (book.getCopiesAvailable() <= 0) {
             throw new NoAvailableCopiesException("No copies available for book: " + bookId);
+        }
+
+        //Cannot reserve the same book twice
+        if (reservationRepo.existsByUserAndBook(userId, bookId)) {
+            throw new IllegalStateException("User " + userId + " has already reserved book " + bookId);
         }
 
         //Decrease available copies
