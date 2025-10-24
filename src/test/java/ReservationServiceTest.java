@@ -11,7 +11,9 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
+
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Create and save a book with 2 available copies
         Book book = new Book("b1", "Clean Code", 2);
@@ -30,7 +32,9 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
+
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Arrange: Create and save a book
         Book book = new Book("b1", "Clean Code", 2);
@@ -50,7 +54,9 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
+
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Arrange: Create and save a book with 0 available copies
         Book book = new Book("b2", "Refactoring", 0);
@@ -66,7 +72,9 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
+
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Arrange: Book with 2 copies
         Book book = new Book("b3", "Domain-Driven Design", 2);
@@ -85,7 +93,9 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
+
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Arrange: Book with 1 copy, reserved by user
         Book book = new Book("b4", "Effective Java", 1);
@@ -104,7 +114,9 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
+
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Arrange: Book with 1 copy, no reservation made
         Book book = new Book("b5", "Clean Code", 1);
@@ -122,7 +134,9 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
+
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Arrange: Book reserved by user
         Book book = new Book("b6", "Refactoring", 1);
@@ -142,7 +156,9 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
+
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Arrange: Add books and reservations
         Book book1 = new Book("b7", "Domain-Driven Design", 2);
@@ -168,9 +184,10 @@ public class ReservationServiceTest {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
         IUserRepository userRepo = new MemoryUserRepository(); // Needed for priority lookup
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository();
 
         // Inject all repositories into the service
-        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
 
         // Create and save a book with 0 available copies
         Book book = new Book("b9", "Working Effectively with Legacy Code", 0);
@@ -185,6 +202,33 @@ public class ReservationServiceTest {
 
         // Assert: Reservation should exist despite no available copies
         assertTrue(reservationRepo.existsByUserAndBook("u9", "b9"));
+    }
+    // to add priority user to waiting list when a book has ) copies left
+    @Test
+    void priorityUserIsAutoReservedWhenCopyBecomesAvailable() {
+        // Arrange: Set up repositories
+        IBookRepository bookRepo = new MemoryBookRepository();
+        IReservationRepository reservationRepo = new MemoryReservationRepository();
+        IUserRepository userRepo = new MemoryUserRepository();
+        IWaitingListRepository waitingListRepo = new MemoryWaitingListRepository(); // You'll need to create this
+        // Inject all repositories into the service
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo, waitingListRepo);
+
+        Book book = new Book("b10", "Test-Driven Development", 1);
+        bookRepo.save(book);
+
+        // Reserve the only copy
+        service.reserve("user1", "b10");
+
+        // Priority user tries to reserve and is added to waiting list
+        userRepo.save(new User("priorityUser", true));
+        service.reserve("priorityUser", "b10");
+
+        // Cancel the original reservation
+        service.cancel("user1", "b10");
+
+        // Assert: priority user should now have the reservation
+        assertTrue(reservationRepo.existsByUserAndBook("priorityUser", "b10"));
     }
 
 
