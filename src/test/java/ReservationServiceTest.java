@@ -10,7 +10,8 @@ public class ReservationServiceTest {
     void testReserveBookSuccessfully() {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
 
         // Create and save a book with 2 available copies
         Book book = new Book("b1", "Clean Code", 2);
@@ -28,7 +29,8 @@ public class ReservationServiceTest {
     void testReserveCreatesReservation() {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
 
         // Arrange: Create and save a book
         Book book = new Book("b1", "Clean Code", 2);
@@ -47,7 +49,8 @@ public class ReservationServiceTest {
     void testReserveFailsWhenNoCopiesAvailable() {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
 
         // Arrange: Create and save a book with 0 available copies
         Book book = new Book("b2", "Refactoring", 0);
@@ -62,7 +65,8 @@ public class ReservationServiceTest {
     void testReserveFailsIfAlreadyReserved() {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
 
         // Arrange: Book with 2 copies
         Book book = new Book("b3", "Domain-Driven Design", 2);
@@ -80,7 +84,8 @@ public class ReservationServiceTest {
     void cancelShouldIncreaseCopiesAvailable() {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
 
         // Arrange: Book with 1 copy, reserved by user
         Book book = new Book("b4", "Effective Java", 1);
@@ -98,7 +103,8 @@ public class ReservationServiceTest {
     void cancelShouldDoNothingIfReservationDoesNotExist() {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
 
         // Arrange: Book with 1 copy, no reservation made
         Book book = new Book("b5", "Clean Code", 1);
@@ -115,7 +121,8 @@ public class ReservationServiceTest {
     void cancelShouldRemoveReservation() {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
 
         // Arrange: Book reserved by user
         Book book = new Book("b6", "Refactoring", 1);
@@ -134,7 +141,8 @@ public class ReservationServiceTest {
     void findReservationsByUserShouldReturnCorrectBooks() {
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Added for constructor
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
 
         // Arrange: Add books and reservations
         Book book1 = new Book("b7", "Domain-Driven Design", 2);
@@ -155,17 +163,24 @@ public class ReservationServiceTest {
 
     // Failing test: priority user should be able to reserve even if no copies are available
     @Test
-    void priorityUserCanReserveWhenNoCopiesAvailable() {
+    void priorityUserShouldBeAbleToReserveEvenIfNoCopiesAreAvailable() {
+        // Arrange: Create repositories
         IBookRepository bookRepo = new MemoryBookRepository();
         IReservationRepository reservationRepo = new MemoryReservationRepository();
-        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+        IUserRepository userRepo = new MemoryUserRepository(); // Needed for priority lookup
 
-        // Arrange: Book with 0 copies
+        // Inject all repositories into the service
+        ReservationService service = new ReservationService(bookRepo, reservationRepo, userRepo);
+
+        // Create and save a book with 0 available copies
         Book book = new Book("b9", "Working Effectively with Legacy Code", 0);
         bookRepo.save(book);
 
-        // Act: Priority user attempts to reserve
+        // Create and save a priority user
         User priorityUser = new User("u9", true); // true = isPriority
+        userRepo.save(priorityUser);
+
+        // Act: Priority user attempts to reserve
         service.reserve(priorityUser.getId(), book.getId());
 
         // Assert: Reservation should exist despite no available copies

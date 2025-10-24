@@ -7,13 +7,17 @@ public class ReservationService {
 
     private final IBookRepository bookRepo;
     private final IReservationRepository reservationRepo;
+    private final IUserRepository userRepo; // Added for reserve() (Required for priority user logic)
 
-    public ReservationService(IBookRepository bookRepo, IReservationRepository reservationRepo) {
+
+    // Constructor to inject all repositories
+    public ReservationService(IBookRepository bookRepo, IReservationRepository reservationRepo, IUserRepository userRepo) {
         this.bookRepo = bookRepo;
         this.reservationRepo = reservationRepo;
+        this.userRepo = userRepo;
     }
 
-    // Reserve a book for a user (with rule: must not already be reserved)
+   /* // Reserve a book for a user (with rule: must not already be reserved)
     public void reserve(String userId, String bookId) {
         Book book = bookRepo.findById(bookId);
 
@@ -36,7 +40,7 @@ public class ReservationService {
         Reservation reservation = new Reservation(userId, bookId);
         reservationRepo.save(reservation);
 
-    }
+    }*/
 
     // Cancels a reservation and increases the book's available copies
     public void cancel(String userId, String bookId) {
@@ -73,6 +77,42 @@ public class ReservationService {
 
         return reservedBooks;
     }
+
+    // Attempts to reserve a book for a user.
+    // Preconditions:
+    // - Book must exist.
+    // - User must not have already reserved the same book.
+    // - If no copies are available, only priority users may reserve.
+    // Postconditions:
+    // - Book's available copies are reduced (if not priority user).
+    // - A reservation is created and saved.
+    public void reserve(String userId, String bookId) {
+        // Retrieve the book from the repository
+        Book book = bookRepo.findById(bookId);
+
+        // Check if the user has already reserved this book
+        if (reservationRepo.existsByUserAndBook(userId, bookId)) {
+            throw new IllegalStateException("User " + userId + " has already reserved book " + bookId);
+        }
+
+        // If no copies are available, check if the user is a priority user
+        if (book.getCopiesAvailable() <= 0) {
+            User user = userRepo.findById(userId);
+            if (user == null || !user.isPriority()) {
+                throw new NoAvailableCopiesException("No copies available for book: " + bookId);
+            }
+            // Priority user is allowed to reserve even if no copies
+        } else {
+            // Decrease available copies for regular reservations
+            book.setCopiesAvailable(book.getCopiesAvailable() - 1);
+            bookRepo.save(book);
+        }
+
+        // Create and save the reservation
+        Reservation reservation = new Reservation(userId, bookId);
+        reservationRepo.save(reservation);
+    }
+
 
 
 }
