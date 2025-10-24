@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+
 
 // Test class for ReservationService
 public class ReservationServiceTest {
@@ -108,7 +110,7 @@ public class ReservationServiceTest {
         // Assert: copiesAvailable should remain unchanged
         assertEquals(1, bookRepo.findById("b5").getCopiesAvailable());
     }
-    // Failing test: cancel() should remove the reservation
+    // test: cancel() should remove the reservation
     @Test
     void cancelShouldRemoveReservation() {
         IBookRepository bookRepo = new MemoryBookRepository();
@@ -125,6 +127,29 @@ public class ReservationServiceTest {
 
         // Assert: Reservation should no longer exist
         assertFalse(reservationRepo.existsByUserAndBook("u6", "b6"));
+    }
+    // Failing test: findReservationsByUser() should return books reserved by the user
+    @Test
+    void findReservationsByUserShouldReturnCorrectBooks() {
+        IBookRepository bookRepo = new MemoryBookRepository();
+        IReservationRepository reservationRepo = new MemoryReservationRepository();
+        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+
+        // Arrange: Add books and reservations
+        Book book1 = new Book("b7", "Domain-Driven Design", 2);
+        Book book2 = new Book("b8", "The Pragmatic Programmer", 1);
+        bookRepo.save(book1);
+        bookRepo.save(book2);
+        service.reserve("u7", "b7");
+        service.reserve("u7", "b8");
+
+        // Act: Retrieve reserved books
+        List<Book> reservedBooks = service.findReservationsByUser("u7");
+
+        // Assert: Should contain both books
+        assertEquals(2, reservedBooks.size());
+        assertTrue(reservedBooks.stream().anyMatch(b -> b.getId().equals("b7")));
+        assertTrue(reservedBooks.stream().anyMatch(b -> b.getId().equals("b8")));
     }
 
 
