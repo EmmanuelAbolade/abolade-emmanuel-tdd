@@ -91,7 +91,7 @@ public class ReservationServiceTest {
         // Assert: copiesAvailable should be back to 1
         assertEquals(1, bookRepo.findById("b4").getCopiesAvailable());
     }
-    // Failing test: cancel() should do nothing if reservation doesn't exist
+    // test: cancel() should do nothing if reservation doesn't exist
     @Test
     void cancelShouldDoNothingIfReservationDoesNotExist() {
         IBookRepository bookRepo = new MemoryBookRepository();
@@ -107,6 +107,24 @@ public class ReservationServiceTest {
 
         // Assert: copiesAvailable should remain unchanged
         assertEquals(1, bookRepo.findById("b5").getCopiesAvailable());
+    }
+    // Failing test: cancel() should remove the reservation
+    @Test
+    void cancelShouldRemoveReservation() {
+        IBookRepository bookRepo = new MemoryBookRepository();
+        IReservationRepository reservationRepo = new MemoryReservationRepository();
+        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+
+        // Arrange: Book reserved by user
+        Book book = new Book("b6", "Refactoring", 1);
+        bookRepo.save(book);
+        service.reserve("u6", "b6");
+
+        // Act: Cancel the reservation
+        service.cancel("u6", "b6");
+
+        // Assert: Reservation should no longer exist
+        assertFalse(reservationRepo.existsByUserAndBook("u6", "b6"));
     }
 
 
