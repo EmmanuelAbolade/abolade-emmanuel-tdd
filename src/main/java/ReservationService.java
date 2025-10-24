@@ -36,6 +36,11 @@ public class ReservationService {
 
     // Cancels a reservation and increases the book's available copies
     public void cancel(String userId, String bookId) {
+        // Check if the reservation exists
+        if (!reservationRepo.existsByUserAndBook(userId, bookId)) {
+            return; // Do nothing if no reservation found
+        }
+
         // Retrieve the book being cancelled
         Book book = bookRepo.findById(bookId);
 
