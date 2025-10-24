@@ -32,6 +32,22 @@ public class ReservationService {
         Reservation reservation = new Reservation(userId, bookId);
         reservationRepo.save(reservation);
 
-
     }
+
+    // Cancels a reservation and increases the book's available copies
+    public void cancel(String userId, String bookId) {
+        // Retrieve the book being cancelled
+        Book book = bookRepo.findById(bookId);
+
+        // Increase the number of available copies
+        book.setCopiesAvailable(book.getCopiesAvailable() + 1);
+
+        // Save the updated book back to the repository
+        bookRepo.save(book);
+
+        // Remove the reservation from the repository
+        reservationRepo.delete(userId, bookId);
+    }
+
+
 }
