@@ -8,39 +8,16 @@ public class ReservationService {
     private final IBookRepository bookRepo;
     private final IReservationRepository reservationRepo;
     private final IUserRepository userRepo; // Added for reserve() (Required for priority user logic)
+    private final IWaitingListRepository waitingListRepo; // Added for managing priority waiting list
 
 
     // Constructor to inject all repositories
-    public ReservationService(IBookRepository bookRepo, IReservationRepository reservationRepo, IUserRepository userRepo) {
+    public ReservationService(IBookRepository bookRepo, IReservationRepository reservationRepo, IUserRepository userRepo, IWaitingListRepository waitingListRepo) {
         this.bookRepo = bookRepo;
         this.reservationRepo = reservationRepo;
         this.userRepo = userRepo;
+        this.waitingListRepo = waitingListRepo;
     }
-
-   /* // Reserve a book for a user (with rule: must not already be reserved)
-    public void reserve(String userId, String bookId) {
-        Book book = bookRepo.findById(bookId);
-
-        //Cannot reserve if no copies available
-        if (book.getCopiesAvailable() <= 0) {
-            throw new NoAvailableCopiesException("No copies available for book: " + bookId);
-        }
-
-        //Cannot reserve the same book twice
-        if (reservationRepo.existsByUserAndBook(userId, bookId)) {
-            throw new IllegalStateException("User " + userId + " has already reserved book " + bookId);
-        }
-
-        //Decrease available copies
-        int updatedCopies = book.getCopiesAvailable() - 1;
-        book.setCopiesAvailable(updatedCopies);
-        bookRepo.save(book);
-
-        // Save the reservation
-        Reservation reservation = new Reservation(userId, bookId);
-        reservationRepo.save(reservation);
-
-    }*/
 
     // Cancels a reservation and increases the book's available copies
     public void cancel(String userId, String bookId) {
@@ -102,6 +79,10 @@ public class ReservationService {
                 throw new NoAvailableCopiesException("No copies available for book: " + bookId);
             }
             // Priority user is allowed to reserve even if no copies
+            // Priority user is added to waiting list
+            waitingListRepo.addToWaitingList(bookId, userId);
+            return; // Exit early, reservation will be handled later
+
         } else {
             // Decrease available copies for regular reservations
             book.setCopiesAvailable(book.getCopiesAvailable() - 1);
