@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
+
+
 // Coordinates book reservations
 public class ReservationService {
 
@@ -52,6 +56,22 @@ public class ReservationService {
 
         // Remove the reservation from the repository
         reservationRepo.delete(userId, bookId);
+    }
+    // Returns a list of books reserved by the given user
+    public List<Book> findReservationsByUser(String userId) {
+        // Retrieve all reservations made by the user
+        List<Reservation> reservations = reservationRepo.findByUser(userId);
+
+        // Map each reservation to its corresponding book
+        List<Book> reservedBooks = new ArrayList<>();
+        for (Reservation r : reservations) {
+            Book book = bookRepo.findById(r.getBookId());
+            if (book != null) {
+                reservedBooks.add(book);
+            }
+        }
+
+        return reservedBooks;
     }
 
 
