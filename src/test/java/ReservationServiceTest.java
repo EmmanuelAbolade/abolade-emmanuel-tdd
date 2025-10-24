@@ -3,7 +3,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 
-// Test class for ReservationService
+// Test class for ReservationService (Reserving the last copy)
 public class ReservationServiceTest {
     // Reserve a book successfully
     @Test
@@ -41,7 +41,7 @@ public class ReservationServiceTest {
         assertTrue(reservationRepo.existsByUserAndBook("u1", "b1"));
     }
 
-    // Test for exception when no copies available
+    // Test for exception when no copies available (Attempting to reserve with no copies left)
     // This test checks that an exception is thrown when trying to reserve a book with 0 copies
     @Test
     void testReserveFailsWhenNoCopiesAvailable() {
@@ -93,7 +93,7 @@ public class ReservationServiceTest {
         // Assert: copiesAvailable should be back to 1
         assertEquals(1, bookRepo.findById("b4").getCopiesAvailable());
     }
-    // test: cancel() should do nothing if reservation doesn't exist
+    // test: cancel() should do nothing if reservation doesn't exist (cancelling non-existent resrvations)
     @Test
     void cancelShouldDoNothingIfReservationDoesNotExist() {
         IBookRepository bookRepo = new MemoryBookRepository();
@@ -128,7 +128,8 @@ public class ReservationServiceTest {
         // Assert: Reservation should no longer exist
         assertFalse(reservationRepo.existsByUserAndBook("u6", "b6"));
     }
-    // Failing test: findReservationsByUser() should return books reserved by the user
+
+    // Failing test: findReservationsByUser() should return books reserved by the user (User can view all their reservations)
     @Test
     void findReservationsByUserShouldReturnCorrectBooks() {
         IBookRepository bookRepo = new MemoryBookRepository();
@@ -147,11 +148,29 @@ public class ReservationServiceTest {
         List<Book> reservedBooks = service.findReservationsByUser("u7");
 
         // Assert: Should contain both books
-        assertEquals(2, reservedBooks.size());
+        assertEquals(2, reservedBooks.size()); //checks the book count
         assertTrue(reservedBooks.stream().anyMatch(b -> b.getId().equals("b7")));
         assertTrue(reservedBooks.stream().anyMatch(b -> b.getId().equals("b8")));
     }
 
+    // Failing test: priority user should be able to reserve even if no copies are available
+    @Test
+    void priorityUserCanReserveWhenNoCopiesAvailable() {
+        IBookRepository bookRepo = new MemoryBookRepository();
+        IReservationRepository reservationRepo = new MemoryReservationRepository();
+        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+
+        // Arrange: Book with 0 copies
+        Book book = new Book("b9", "Working Effectively with Legacy Code", 0);
+        bookRepo.save(book);
+
+        // Act: Priority user attempts to reserve
+        User priorityUser = new User("u9", true); // true = isPriority
+        service.reserve(priorityUser.getId(), book.getId());
+
+        // Assert: Reservation should exist despite no available copies
+        assertTrue(reservationRepo.existsByUserAndBook("u9", "b9"));
+    }
 
 
 }
