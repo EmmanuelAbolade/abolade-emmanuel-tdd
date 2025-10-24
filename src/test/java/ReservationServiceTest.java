@@ -73,7 +73,7 @@ public class ReservationServiceTest {
         assertThrows(IllegalStateException.class, () -> service.reserve("u3", "b3"));
     }
 
-    // Failing test: cancel() increases copiesAvailable
+    // test: cancel() increases copiesAvailable
     @Test
     void cancelShouldIncreaseCopiesAvailable() {
         IBookRepository bookRepo = new MemoryBookRepository();
@@ -90,6 +90,23 @@ public class ReservationServiceTest {
 
         // Assert: copiesAvailable should be back to 1
         assertEquals(1, bookRepo.findById("b4").getCopiesAvailable());
+    }
+    // Failing test: cancel() should do nothing if reservation doesn't exist
+    @Test
+    void cancelShouldDoNothingIfReservationDoesNotExist() {
+        IBookRepository bookRepo = new MemoryBookRepository();
+        IReservationRepository reservationRepo = new MemoryReservationRepository();
+        ReservationService service = new ReservationService(bookRepo, reservationRepo);
+
+        // Arrange: Book with 1 copy, no reservation made
+        Book book = new Book("b5", "Clean Code", 1);
+        bookRepo.save(book);
+
+        // Act: Attempt to cancel a non-existent reservation
+        service.cancel("u5", "b5");
+
+        // Assert: copiesAvailable should remain unchanged
+        assertEquals(1, bookRepo.findById("b5").getCopiesAvailable());
     }
 
 
